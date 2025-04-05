@@ -11,12 +11,12 @@ import CommandHistory from '@/components/CommandHistory';
 const GestureControlPage: React.FC = () => {
   const [isDetecting, setIsDetecting] = useState(false);
   
-  // Demo commands history for gesture controls - using non-readonly array
+  // Demo commands history for gesture controls - fixed type values to match CommandProps interface
   const commands = [
-    { id: '1', type: 'gesture', command: 'Swipe Left', timestamp: '10:20 AM', status: 'success' },
-    { id: '2', type: 'gesture', command: 'Pinch Zoom', timestamp: '10:18 AM', status: 'success' },
-    { id: '3', type: 'gesture', command: 'Scroll Down', timestamp: '10:15 AM', status: 'error' },
-    { id: '4', type: 'gesture', command: 'Click', timestamp: '10:14 AM', status: 'success' },
+    { id: '1', type: 'gesture' as const, command: 'Swipe Left', timestamp: '10:20 AM', status: 'success' as const },
+    { id: '2', type: 'gesture' as const, command: 'Pinch Zoom', timestamp: '10:18 AM', status: 'success' as const },
+    { id: '3', type: 'gesture' as const, command: 'Scroll Down', timestamp: '10:15 AM', status: 'error' as const },
+    { id: '4', type: 'gesture' as const, command: 'Click', timestamp: '10:14 AM', status: 'success' as const },
   ];
 
   const toggleDetection = () => {

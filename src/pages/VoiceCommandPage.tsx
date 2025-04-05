@@ -12,12 +12,12 @@ const VoiceCommandPage: React.FC = () => {
   const [isListening, setIsListening] = useState(false);
   const [recognizedText, setRecognizedText] = useState("");
   
-  // Demo commands history - using non-readonly array
+  // Demo commands history - fixed type values to match CommandProps interface
   const commands = [
-    { id: '1', type: 'voice', command: 'Open Browser', timestamp: '10:15 AM', status: 'success' },
-    { id: '2', type: 'voice', command: 'Volume Up', timestamp: '10:12 AM', status: 'success' },
-    { id: '3', type: 'voice', command: 'Launch Spotify', timestamp: '10:10 AM', status: 'error' },
-    { id: '4', type: 'voice', command: 'Next Slide', timestamp: '10:05 AM', status: 'success' },
+    { id: '1', type: 'voice' as const, command: 'Open Browser', timestamp: '10:15 AM', status: 'success' as const },
+    { id: '2', type: 'voice' as const, command: 'Volume Up', timestamp: '10:12 AM', status: 'success' as const },
+    { id: '3', type: 'voice' as const, command: 'Launch Spotify', timestamp: '10:10 AM', status: 'error' as const },
+    { id: '4', type: 'voice' as const, command: 'Next Slide', timestamp: '10:05 AM', status: 'success' as const },
   ];
 
   const toggleListening = () => {

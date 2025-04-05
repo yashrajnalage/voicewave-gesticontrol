@@ -8,16 +8,16 @@ import StatCard from '@/components/StatCard';
 import CommandHistory from '@/components/CommandHistory';
 
 const DashboardPage: React.FC = () => {
-  // Demo commands for both voice and gestures - using non-readonly array
+  // Demo commands for both voice and gestures - fixed type values to match CommandProps interface
   const allCommands = [
-    { id: '1', type: 'voice', command: 'Open Browser', timestamp: '10:15 AM', status: 'success' },
-    { id: '2', type: 'gesture', command: 'Swipe Left', timestamp: '10:20 AM', status: 'success' },
-    { id: '3', type: 'voice', command: 'Volume Up', timestamp: '10:12 AM', status: 'success' },
-    { id: '4', type: 'gesture', command: 'Pinch Zoom', timestamp: '10:18 AM', status: 'success' },
-    { id: '5', type: 'voice', command: 'Launch Spotify', timestamp: '10:10 AM', status: 'error' },
-    { id: '6', type: 'gesture', command: 'Scroll Down', timestamp: '10:15 AM', status: 'error' },
-    { id: '7', type: 'voice', command: 'Next Slide', timestamp: '10:05 AM', status: 'success' },
-    { id: '8', type: 'gesture', command: 'Click', timestamp: '10:14 AM', status: 'success' },
+    { id: '1', type: 'voice' as const, command: 'Open Browser', timestamp: '10:15 AM', status: 'success' as const },
+    { id: '2', type: 'gesture' as const, command: 'Swipe Left', timestamp: '10:20 AM', status: 'success' as const },
+    { id: '3', type: 'voice' as const, command: 'Volume Up', timestamp: '10:12 AM', status: 'success' as const },
+    { id: '4', type: 'gesture' as const, command: 'Pinch Zoom', timestamp: '10:18 AM', status: 'success' as const },
+    { id: '5', type: 'voice' as const, command: 'Launch Spotify', timestamp: '10:10 AM', status: 'error' as const },
+    { id: '6', type: 'gesture' as const, command: 'Scroll Down', timestamp: '10:15 AM', status: 'error' as const },
+    { id: '7', type: 'voice' as const, command: 'Next Slide', timestamp: '10:05 AM', status: 'success' as const },
+    { id: '8', type: 'gesture' as const, command: 'Click', timestamp: '10:14 AM', status: 'success' as const },
   ];
 
   const voiceCommands = allCommands.filter(cmd => cmd.type === 'voice');
