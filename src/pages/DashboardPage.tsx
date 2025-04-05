@@ -8,7 +8,7 @@ import StatCard from '@/components/StatCard';
 import CommandHistory from '@/components/CommandHistory';
 
 const DashboardPage: React.FC = () => {
-  // Demo commands for both voice and gestures
+  // Demo commands for both voice and gestures - using non-readonly array
   const allCommands = [
     { id: '1', type: 'voice', command: 'Open Browser', timestamp: '10:15 AM', status: 'success' },
     { id: '2', type: 'gesture', command: 'Swipe Left', timestamp: '10:20 AM', status: 'success' },
@@ -18,7 +18,7 @@ const DashboardPage: React.FC = () => {
     { id: '6', type: 'gesture', command: 'Scroll Down', timestamp: '10:15 AM', status: 'error' },
     { id: '7', type: 'voice', command: 'Next Slide', timestamp: '10:05 AM', status: 'success' },
     { id: '8', type: 'gesture', command: 'Click', timestamp: '10:14 AM', status: 'success' },
-  ] as const;
+  ];
 
   const voiceCommands = allCommands.filter(cmd => cmd.type === 'voice');
   const gestureCommands = allCommands.filter(cmd => cmd.type === 'gesture');
