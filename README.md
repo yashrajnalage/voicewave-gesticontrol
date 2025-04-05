@@ -1,69 +1,74 @@
-# Welcome to your Lovable project
 
-## Project info
+# GAMINATOR
 
-**URL**: https://lovable.dev/projects/dce3f7f6-4e9d-490d-a1cb-b4ae4ca1fa61
+GAMINATOR is a desktop application that allows users to control their computer using voice commands and hand gestures, eliminating the need for traditional keyboard and mouse inputs.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- **Voice Command Control**: Use your voice to control applications, navigate your system, and perform actions
+- **Gesture Recognition**: Control your computer with hand gestures captured via your webcam
+- **Dashboard**: Monitor your usage statistics and activity history
+- **Customizable Settings**: Adjust sensitivity, language, notification preferences and more
 
-**Use Lovable**
+## Requirements
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/dce3f7f6-4e9d-490d-a1cb-b4ae4ca1fa61) and start prompting.
+- Python 3.7+
+- PyQt5
+- OpenCV
+- SpeechRecognition
+- PyAudio
 
-Changes made via Lovable will be committed automatically to this repo.
+## Installation
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+1. Clone this repository
+```bash
+git clone https://github.com/yourusername/gaminator.git
+cd gaminator
 ```
 
-**Edit a file directly in GitHub**
+2. Create a virtual environment (recommended)
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
 
-**Use GitHub Codespaces**
+## Usage
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Run the main application:
+```bash
+python gaminator.py
+```
 
-## What technologies are used for this project?
+## Project Structure
 
-This project is built with .
+- `gaminator.py` - Main application entry point
+- `views/` - UI views for different screens
+  - `home_view.py` - Home screen
+  - `voice_command_view.py` - Voice command interface
+  - `gesture_control_view.py` - Gesture control interface
+  - `dashboard_view.py` - Statistics and activity dashboard
+  - `settings_view.py` - Application settings
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Voice Commands
 
-## How can I deploy this project?
+Example voice commands include:
+- "Open Browser"
+- "Volume Up/Down"
+- "Close Window"
+- "Scroll Down"
 
-Simply open [Lovable](https://lovable.dev/projects/dce3f7f6-4e9d-490d-a1cb-b4ae4ca1fa61) and click on Share -> Publish.
+## Gesture Controls
 
-## I want to use a custom domain - is that possible?
+Example gestures include:
+- Swipe left/right - Navigate between applications
+- Pinch to zoom - Zoom in/out
+- Open palm - Pause/resume
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## License
+
+[MIT License](LICENSE)
