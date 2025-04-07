@@ -1,76 +1,67 @@
 
 # GAMINATOR
 
-GAMINATOR is a desktop application that allows users to control their computer using voice commands and hand gestures, eliminating the need for traditional keyboard and mouse inputs.
+A desktop application for controlling your computer using voice commands and hand gestures.
 
 ## Features
 
-- **Voice Command Control**: Use your voice to control applications, navigate your system, and perform actions
-- **Gesture Recognition**: Control your computer with hand gestures captured via your webcam
-- **Dashboard**: Monitor your usage statistics and activity history
-- **Customizable Settings**: Adjust sensitivity, language, notification preferences and more
+- **Voice Control**: Use voice commands to control your computer
+- **Gesture Recognition**: Control your system with hand gestures
+- **Dashboard**: Monitor your usage statistics
+- **Settings**: Customize the application to your preferences
 
 ## Requirements
 
-- Python 3.7+
+- Python 3.6 or higher
 - PyQt5
 - OpenCV
-- SpeechRecognition
-- PyAudio
 - NumPy
 
 ## Installation
 
-1. Clone this repository
-```bash
-git clone https://github.com/yourusername/gaminator.git
+1. Clone this repository:
+```
+git clone https://github.com/your-username/gaminator.git
 cd gaminator
 ```
 
-2. Create a virtual environment (recommended)
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+2. Install the required packages:
+```
+pip install -r requirements.txt
 ```
 
-3. Install dependencies
-```bash
-pip install -r requirements.txt
+3. Run the application:
+```
+python gaminator.py
 ```
 
 ## Usage
 
-Run the main application:
-```bash
-python gaminator.py
-```
+1. **Voice Commands**:
+   - Click "Start Listening" to activate voice recognition
+   - Speak commands like "Open Browser", "Volume Up", etc.
 
-## Project Structure
+2. **Gesture Control**:
+   - Click "Start Camera" to enable your webcam
+   - Use hand gestures to control your computer
+   - Try gestures like swiping left/right, pinching to zoom, etc.
 
-- `gaminator.py` - Main application entry point
-- `views/` - UI views for different screens
-  - `base_view.py` - Base class for all views
-  - `home_view.py` - Home screen
-  - `voice_command_view.py` - Voice command interface
-  - `gesture_control_view.py` - Gesture control interface
-  - `dashboard_view.py` - Statistics and activity dashboard
-  - `settings_view.py` - Application settings
+3. **Dashboard**:
+   - View statistics on your command usage
+   - Monitor success rates and usage patterns
 
-## Voice Commands
+4. **Settings**:
+   - Customize voice recognition settings
+   - Adjust gesture detection sensitivity
+   - Configure notification preferences
 
-Example voice commands include:
-- "Open Browser"
-- "Volume Up/Down"
-- "Close Window"
-- "Scroll Down"
+## Development
 
-## Gesture Controls
-
-Example gestures include:
-- Swipe left/right - Navigate between applications
-- Pinch to zoom - Zoom in/out
-- Open palm - Pause/resume
+This application is built using:
+- PyQt5 for the user interface
+- OpenCV for camera access and image processing
+- NumPy for numerical calculations
 
 ## License
 
-[MIT License](LICENSE)
+[MIT](LICENSE)

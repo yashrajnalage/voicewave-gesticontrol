@@ -4,11 +4,11 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt, QSize
 
-from views.home_view import HomeView
-from views.voice_command_view import VoiceCommandView
-from views.gesture_control_view import GestureControlView
-from views.dashboard_view import DashboardView
-from views.settings_view import SettingsView
+from home_view import HomeView
+from voice_command_view import VoiceCommandView
+from gesture_control_view import GestureControlView
+from dashboard_view import DashboardView
+from settings_view import SettingsView
 
 class Gaminator(QMainWindow):
     def __init__(self):
