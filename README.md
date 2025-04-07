@@ -17,6 +17,7 @@ GAMINATOR is a desktop application that allows users to control their computer u
 - OpenCV
 - SpeechRecognition
 - PyAudio
+- NumPy
 
 ## Installation
 
@@ -48,6 +49,7 @@ python gaminator.py
 
 - `gaminator.py` - Main application entry point
 - `views/` - UI views for different screens
+  - `base_view.py` - Base class for all views
   - `home_view.py` - Home screen
   - `voice_command_view.py` - Voice command interface
   - `gesture_control_view.py` - Gesture control interface
