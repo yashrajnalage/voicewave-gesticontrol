@@ -1,314 +1,181 @@
 
-from PyQt5.QtWidgets import (QLabel, QPushButton, QVBoxLayout, QHBoxLayout, 
-                           QGridLayout, QFrame, QTabWidget, QWidget)
+from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QHBoxLayout, QWidget, 
+                            QProgressBar, QFrame)
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QColor, QPainter, QBrush, QPen
 from views.base_view import BaseView
-from views.voice_command_view import CommandHistory
-
-class StatCard(QFrame):
-    """Statistics card for the dashboard"""
-    
-    def __init__(self, title, value, description, trend, trend_value, icon, parent=None):
-        super().__init__(parent)
-        self.title = title
-        self.value = value
-        self.description = description
-        self.trend = trend  # "up", "down", or "neutral"
-        self.trend_value = trend_value
-        self.icon = icon
-        self.setup_ui()
-        
-    def setup_ui(self):
-        self.setStyleSheet("""
-            QFrame {
-                background-color: #2A2F3C;
-                border-radius: 10px;
-                border: 1px solid #3A3F4C;
-            }
-            QLabel {
-                color: white;
-            }
-        """)
-        
-        layout = QHBoxLayout()
-        
-        # Left side - icon
-        icon_label = QLabel(self.icon)
-        icon_label.setStyleSheet("font-size: 20px;")
-        layout.addWidget(icon_label)
-        
-        # Right side - info
-        info_layout = QVBoxLayout()
-        
-        # Title
-        title_label = QLabel(self.title)
-        title_label.setStyleSheet("color: #B0B0B0; font-size: 9pt;")
-        
-        # Value
-        value_label = QLabel(str(self.value))
-        value_label.setFont(QFont("Arial", 18, QFont.Bold))
-        
-        # Description and trend
-        desc_layout = QHBoxLayout()
-        desc_label = QLabel(self.description)
-        desc_label.setStyleSheet("color: #B0B0B0; font-size: 8pt;")
-        
-        trend_icon = "↑" if self.trend == "up" else "↓" if self.trend == "down" else "→"
-        trend_color = "#10B981" if self.trend == "up" else "#EF4444" if self.trend == "down" else "#B0B0B0"
-        
-        trend_label = QLabel(f"{trend_icon} {self.trend_value}")
-        trend_label.setStyleSheet(f"color: {trend_color}; font-size: 8pt;")
-        
-        desc_layout.addWidget(desc_label)
-        desc_layout.addWidget(trend_label)
-        desc_layout.addStretch()
-        
-        info_layout.addWidget(title_label)
-        info_layout.addWidget(value_label)
-        info_layout.addLayout(desc_layout)
-        
-        layout.addLayout(info_layout)
-        layout.addStretch()
-        
-        self.setLayout(layout)
-
 
 class DashboardView(BaseView):
-    """Dashboard view for the application"""
+    """View for the dashboard and statistics"""
     
     def __init__(self, parent=None):
-        self.all_commands = [
-            {"id": "1", "type": "voice", "command": "Open Browser", "timestamp": "10:15 AM", "status": "success"},
-            {"id": "2", "type": "gesture", "command": "Swipe Left", "timestamp": "10:20 AM", "status": "success"},
-            {"id": "3", "type": "voice", "command": "Volume Up", "timestamp": "10:12 AM", "status": "success"},
-            {"id": "4", "type": "gesture", "command": "Pinch Zoom", "timestamp": "10:18 AM", "status": "success"},
-            {"id": "5", "type": "voice", "command": "Launch Spotify", "timestamp": "10:10 AM", "status": "error"},
-            {"id": "6", "type": "gesture", "command": "Scroll Down", "timestamp": "10:15 AM", "status": "error"},
-            {"id": "7", "type": "voice", "command": "Next Slide", "timestamp": "10:05 AM", "status": "success"},
-            {"id": "8", "type": "gesture", "command": "Click", "timestamp": "10:14 AM", "status": "success"},
-        ]
-        self.voice_commands = [cmd for cmd in self.all_commands if cmd["type"] == "voice"]
-        self.gesture_commands = [cmd for cmd in self.all_commands if cmd["type"] == "gesture"]
         super().__init__(parent)
         
     def setup_ui(self):
+        """Set up the UI components"""
         super().setup_ui()
         
-        # Title
+        # Main title
         title_label = QLabel("Dashboard")
-        title_label.setFont(QFont("Arial", 18, QFont.Bold))
+        title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
         self.main_layout.addWidget(title_label)
         
-        subtitle = QLabel("Monitor your control activity and performance")
-        subtitle.setStyleSheet("color: #B0B0B0;")
-        self.main_layout.addWidget(subtitle)
+        subtitle_label = QLabel("Monitor your usage statistics and activity")
+        subtitle_label.setStyleSheet("font-size: 14px; color: #888;")
+        self.main_layout.addWidget(subtitle_label)
         
-        # Stats grid
-        stats_layout = QGridLayout()
+        # Stats overview section
+        stats_layout = QHBoxLayout()
         
-        voice_card = StatCard("Voice Commands", 24, "Used today", "up", "12%", "🎤")
-        gesture_card = StatCard("Gesture Controls", 18, "Used today", "up", "8%", "👋")
-        recognition_card = StatCard("Recognition Rate", "92%", "Accuracy", "neutral", "0%", "⚡")
-        time_card = StatCard("Active Time", "3h 24m", "Today", "down", "5%", "⏱️")
+        # Voice command stats
+        voice_stats = self.create_stat_widget(
+            "Voice Commands", 
+            "142", 
+            "75% success rate",
+            "#8B5CF6"
+        )
         
-        stats_layout.addWidget(voice_card, 0, 0)
-        stats_layout.addWidget(gesture_card, 0, 1)
-        stats_layout.addWidget(recognition_card, 0, 2)
-        stats_layout.addWidget(time_card, 0, 3)
+        # Gesture control stats
+        gesture_stats = self.create_stat_widget(
+            "Gestures Used", 
+            "96", 
+            "68% success rate",
+            "#22C55E"
+        )
+        
+        # Session stats
+        session_stats = self.create_stat_widget(
+            "Sessions", 
+            "24", 
+            "42 minutes avg",
+            "#3B82F6"
+        )
+        
+        stats_layout.addWidget(voice_stats)
+        stats_layout.addWidget(gesture_stats)
+        stats_layout.addWidget(session_stats)
         
         self.main_layout.addLayout(stats_layout)
         
-        # Main content grid (activity history and popular commands)
-        content_layout = QGridLayout()
+        # Usage graphs section
+        graphs_layout = QVBoxLayout()
         
-        # Activity history card
-        activity_frame = QFrame()
-        activity_frame.setStyleSheet("""
-            QFrame {
-                background-color: #2A2F3C;
-                border-radius: 10px;
-                border: 1px solid #3A3F4C;
-            }
-            QTabWidget::pane {
-                border: none;
-                background-color: transparent;
-            }
-            QTabBar::tab {
-                background-color: #1A1F2C;
-                color: #B0B0B0;
-                border-top-left-radius: 4px;
-                border-top-right-radius: 4px;
-                padding: 8px 12px;
-                margin-right: 2px;
-            }
-            QTabBar::tab:selected {
-                background-color: #8B5CF6;
-                color: white;
-            }
+        # Daily usage chart
+        daily_chart = QWidget()
+        daily_layout = QVBoxLayout(daily_chart)
+        
+        daily_title = QLabel("Daily Usage")
+        daily_title.setStyleSheet("font-weight: bold;")
+        daily_layout.addWidget(daily_title)
+        
+        # Placeholder for chart - in a real app, this would be a proper chart widget
+        chart_placeholder = QWidget()
+        chart_placeholder.setMinimumHeight(150)
+        chart_placeholder.setStyleSheet("background-color: #1E212A; border-radius: 5px;")
+        daily_layout.addWidget(chart_placeholder)
+        
+        daily_chart.setStyleSheet("background-color: #2A2F3C; border-radius: 10px; padding: 15px;")
+        graphs_layout.addWidget(daily_chart)
+        
+        # Recent activities
+        activities = QWidget()
+        activities_layout = QVBoxLayout(activities)
+        
+        activities_title = QLabel("Recent Activities")
+        activities_title.setStyleSheet("font-weight: bold;")
+        activities_layout.addWidget(activities_title)
+        
+        # Activity 1
+        act1 = QHBoxLayout()
+        act1_time = QLabel("10:35 AM")
+        act1_time.setStyleSheet("color: #888;")
+        act1_desc = QLabel("Browser opened via voice command")
+        act1.addWidget(act1_time)
+        act1.addWidget(act1_desc)
+        act1.addStretch()
+        activities_layout.addLayout(act1)
+        
+        # Separator line
+        line1 = QFrame()
+        line1.setFrameShape(QFrame.HLine)
+        line1.setFrameShadow(QFrame.Sunken)
+        line1.setStyleSheet("background-color: #444;")
+        activities_layout.addWidget(line1)
+        
+        # Activity 2
+        act2 = QHBoxLayout()
+        act2_time = QLabel("10:28 AM")
+        act2_time.setStyleSheet("color: #888;")
+        act2_desc = QLabel("Volume increased via gesture")
+        act2.addWidget(act2_time)
+        act2.addWidget(act2_desc)
+        act2.addStretch()
+        activities_layout.addLayout(act2)
+        
+        # Separator line
+        line2 = QFrame()
+        line2.setFrameShape(QFrame.HLine)
+        line2.setFrameShadow(QFrame.Sunken)
+        line2.setStyleSheet("background-color: #444;")
+        activities_layout.addWidget(line2)
+        
+        # Activity 3
+        act3 = QHBoxLayout()
+        act3_time = QLabel("10:15 AM")
+        act3_time.setStyleSheet("color: #888;")
+        act3_desc = QLabel("Scroll down gesture detected")
+        act3.addWidget(act3_time)
+        act3.addWidget(act3_desc)
+        act3.addStretch()
+        activities_layout.addLayout(act3)
+        
+        activities.setStyleSheet("background-color: #2A2F3C; border-radius: 10px; padding: 15px;")
+        graphs_layout.addWidget(activities)
+        
+        self.main_layout.addLayout(graphs_layout)
+        
+        self.main_layout.addStretch()
+        
+        # Add navigation bar at the bottom
+        self.main_layout.addLayout(self.nav_layout)
+    
+    def create_stat_widget(self, title, value, subtitle, color):
+        """Create a statistics widget with the given data"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        
+        # Title
+        title_label = QLabel(title)
+        title_label.setStyleSheet("color: #888;")
+        layout.addWidget(title_label)
+        
+        # Value
+        value_label = QLabel(value)
+        value_label.setStyleSheet(f"font-size: 28px; font-weight: bold; color: {color};")
+        layout.addWidget(value_label)
+        
+        # Progress bar
+        progress = QProgressBar()
+        progress.setRange(0, 100)
+        progress.setValue(75 if "75%" in subtitle else 68 if "68%" in subtitle else 80)
+        progress.setTextVisible(False)
+        progress.setStyleSheet(f"""
+            QProgressBar {{
+                background-color: #1E212A;
+                border-radius: 3px;
+                height: 6px;
+            }}
+            QProgressBar::chunk {{
+                background-color: {color};
+                border-radius: 3px;
+            }}
         """)
+        layout.addWidget(progress)
         
-        activity_layout = QVBoxLayout(activity_frame)
+        # Subtitle
+        sub_label = QLabel(subtitle)
+        sub_label.setStyleSheet("color: #888; font-size: 12px;")
+        layout.addWidget(sub_label)
         
-        # Header
-        activity_header = QHBoxLayout()
-        activity_icon = QLabel("📊")
-        activity_title = QLabel("Activity History")
-        activity_title.setFont(QFont("Arial", 14, QFont.Bold))
-        
-        activity_header.addWidget(activity_icon)
-        activity_header.addWidget(activity_title)
-        activity_header.addStretch()
-        
-        activity_layout.addLayout(activity_header)
-        
-        # Tab widget for different command types
-        tabs = QTabWidget()
-        
-        # All commands tab
-        all_tab = QWidget()
-        all_layout = QVBoxLayout(all_tab)
-        all_layout.setContentsMargins(0, 10, 0, 0)
-        all_history = CommandHistory(self.all_commands)
-        all_layout.addWidget(all_history)
-        
-        # Voice commands tab
-        voice_tab = QWidget()
-        voice_layout = QVBoxLayout(voice_tab)
-        voice_layout.setContentsMargins(0, 10, 0, 0)
-        voice_history = CommandHistory(self.voice_commands)
-        voice_layout.addWidget(voice_history)
-        
-        # Gesture commands tab
-        gesture_tab = QWidget()
-        gesture_layout = QVBoxLayout(gesture_tab)
-        gesture_layout.setContentsMargins(0, 10, 0, 0)
-        gesture_history = CommandHistory(self.gesture_commands)
-        gesture_layout.addWidget(gesture_history)
-        
-        tabs.addTab(all_tab, "All Commands")
-        tabs.addTab(voice_tab, "Voice Only")
-        tabs.addTab(gesture_tab, "Gestures Only")
-        
-        activity_layout.addWidget(tabs)
-        
-        # Popular commands card
-        popular_frame = QFrame()
-        popular_frame.setStyleSheet("""
-            QFrame {
-                background-color: #2A2F3C;
-                border-radius: 10px;
-                border: 1px solid #3A3F4C;
-            }
-        """)
-        
-        popular_layout = QVBoxLayout(popular_frame)
-        
-        # Header
-        popular_header = QHBoxLayout()
-        popular_icon = QLabel("⌨️")
-        popular_title = QLabel("Popular Commands")
-        popular_title.setFont(QFont("Arial", 14, QFont.Bold))
-        
-        popular_header.addWidget(popular_icon)
-        popular_header.addWidget(popular_title)
-        popular_header.addStretch()
-        
-        popular_layout.addLayout(popular_header)
-        
-        # Voice commands section
-        voice_section = QFrame()
-        voice_section.setStyleSheet("""
-            QFrame {
-                background-color: rgba(139, 92, 246, 0.1);
-                border-radius: 5px;
-            }
-        """)
-        
-        vs_layout = QVBoxLayout(voice_section)
-        
-        vs_title = QLabel("Voice Commands")
-        vs_title.setFont(QFont("Arial", 10, QFont.Bold))
-        vs_layout.addWidget(vs_title)
-        
-        # Voice command list
-        vs_commands = [
-            ("Open Browser", "28 times"),
-            ("Volume Up", "24 times"),
-            ("Close Window", "19 times")
-        ]
-        
-        for cmd, count in vs_commands:
-            cmd_layout = QHBoxLayout()
-            cmd_name = QLabel(cmd)
-            cmd_name.setStyleSheet("color: #B0B0B0;")
-            
-            cmd_count = QLabel(count)
-            cmd_count.setStyleSheet("""
-                background-color: rgba(139, 92, 246, 0.2);
-                color: #8B5CF6;
-                border-radius: 10px;
-                padding: 2px 6px;
-                font-size: 8pt;
-            """)
-            
-            cmd_layout.addWidget(cmd_name)
-            cmd_layout.addStretch()
-            cmd_layout.addWidget(cmd_count)
-            
-            vs_layout.addLayout(cmd_layout)
-        
-        popular_layout.addWidget(voice_section)
-        
-        # Gesture commands section
-        gesture_section = QFrame()
-        gesture_section.setStyleSheet("""
-            QFrame {
-                background-color: rgba(139, 92, 246, 0.1);
-                border-radius: 5px;
-            }
-        """)
-        
-        gs_layout = QVBoxLayout(gesture_section)
-        
-        gs_title = QLabel("Gesture Controls")
-        gs_title.setFont(QFont("Arial", 10, QFont.Bold))
-        gs_layout.addWidget(gs_title)
-        
-        # Gesture command list
-        gs_commands = [
-            ("Swipe Left", "32 times"),
-            ("Click", "26 times"),
-            ("Scroll Down", "15 times")
-        ]
-        
-        for cmd, count in gs_commands:
-            cmd_layout = QHBoxLayout()
-            cmd_name = QLabel(cmd)
-            cmd_name.setStyleSheet("color: #B0B0B0;")
-            
-            cmd_count = QLabel(count)
-            cmd_count.setStyleSheet("""
-                background-color: rgba(139, 92, 246, 0.2);
-                color: #8B5CF6;
-                border-radius: 10px;
-                padding: 2px 6px;
-                font-size: 8pt;
-            """)
-            
-            cmd_layout.addWidget(cmd_name)
-            cmd_layout.addStretch()
-            cmd_layout.addWidget(cmd_count)
-            
-            gs_layout.addLayout(cmd_layout)
-        
-        popular_layout.addWidget(gesture_section)
-        
-        # Add to content layout
-        content_layout.addWidget(activity_frame, 0, 0, 1, 3)
-        content_layout.addWidget(popular_frame, 0, 3)
-        
-        content_layout.setColumnStretch(0, 3)
-        content_layout.setColumnStretch(3, 1)
-        
-        self.main_layout.addLayout(content_layout)
+        widget.setStyleSheet("background-color: #2A2F3C; border-radius: 10px; padding: 15px;")
+        return widget

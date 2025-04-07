@@ -1,377 +1,208 @@
-from PyQt5.QtWidgets import (QLabel, QPushButton, QVBoxLayout, QHBoxLayout, 
-                           QGridLayout, QFrame, QListWidget, QListWidgetItem)
-from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve
-from PyQt5.QtGui import QFont, QColor
+
+import numpy as np
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QPushButton, 
+                             QHBoxLayout, QListWidget, QListWidgetItem)
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QColor
 from views.base_view import BaseView
-import random
-import math
-
-class VoiceVisualizer(QFrame):
-    """Visualizer for voice activity"""
-    
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setFixedHeight(100)
-        self.setMinimumWidth(200)
-        self.is_active = False
-        self.bars = []
-        self.setup_ui()
-        
-    def setup_ui(self):
-        self.setStyleSheet("""
-            QFrame {
-                background-color: transparent;
-                border: none;
-            }
-        """)
-        
-        # Create layout
-        layout = QHBoxLayout()
-        layout.setSpacing(5)
-        
-        # Create bars
-        for i in range(12):
-            bar = QFrame()
-            bar.setFixedWidth(10)
-            bar.setFixedHeight(5)  # Default height when inactive
-            bar.setStyleSheet("background-color: rgba(139, 92, 246, 0.6); border-radius: 2px;")
-            layout.addWidget(bar)
-            self.bars.append(bar)
-            
-        layout.setAlignment(Qt.AlignBottom | Qt.AlignCenter)
-        self.setLayout(layout)
-        
-    def set_active(self, active):
-        """Set the visualizer active state and start/stop the animation"""
-        self.is_active = active
-        if active:
-            self.start_animation()
-        else:
-            self.stop_animation()
-            
-    def start_animation(self):
-        """Start the bar animation"""
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_bars)
-        self.timer.start(100)
-        
-    def stop_animation(self):
-        """Stop the bar animation"""
-        if hasattr(self, 'timer'):
-            self.timer.stop()
-        # Reset all bars to minimum height
-        for bar in self.bars:
-            bar.setFixedHeight(5)
-            
-    def update_bars(self):
-        """Update the height of each bar"""
-        if not self.is_active:
-            return
-            
-        for i, bar in enumerate(self.bars):
-            # Calculate height based on a sine wave pattern
-            height = int(30 * abs(math.sin((i / 11) * math.pi + random.random()))) + 5
-            bar.setFixedHeight(height)
-
-
-class CommandItem(QFrame):
-    """Individual command item for the command history"""
-    
-    def __init__(self, command_type, command, timestamp, status, parent=None):
-        super().__init__(parent)
-        self.command_type = command_type
-        self.command = command
-        self.timestamp = timestamp
-        self.status = status
-        self.setup_ui()
-        
-    def setup_ui(self):
-        self.setStyleSheet("""
-            QFrame {
-                background-color: rgba(139, 92, 246, 0.1);
-                border-radius: 5px;
-                padding: 5px;
-                margin: 2px;
-            }
-            QLabel {
-                color: white;
-            }
-        """)
-        
-        layout = QHBoxLayout()
-        
-        # Icon
-        icon = QLabel("🎤" if self.command_type == "voice" else "👋")
-        layout.addWidget(icon)
-        
-        # Command info
-        info_layout = QVBoxLayout()
-        command_label = QLabel(self.command)
-        command_label.setFont(QFont("Arial", 10, QFont.Bold))
-        
-        time_label = QLabel(self.timestamp)
-        time_label.setStyleSheet("color: #B0B0B0; font-size: 8pt;")
-        
-        info_layout.addWidget(command_label)
-        info_layout.addWidget(time_label)
-        
-        layout.addLayout(info_layout)
-        layout.addStretch()
-        
-        # Status
-        status_label = QLabel(self.status)
-        if self.status == "success":
-            status_label.setStyleSheet("color: #10B981; font-weight: bold;")
-        else:
-            status_label.setStyleSheet("color: #EF4444; font-weight: bold;")
-        layout.addWidget(status_label)
-        
-        self.setLayout(layout)
-
-
-class CommandHistory(QFrame):
-    """Widget to display command history"""
-    
-    def __init__(self, commands, parent=None):
-        super().__init__(parent)
-        self.commands = commands
-        self.setup_ui()
-        
-    def setup_ui(self):
-        self.setStyleSheet("""
-            QFrame {
-                background-color: #2A2F3C;
-                border-radius: 10px;
-                border: 1px solid #3A3F4C;
-            }
-            QLabel {
-                color: white;
-            }
-            QListWidget {
-                background-color: transparent;
-                border: none;
-            }
-        """)
-        
-        layout = QVBoxLayout()
-        
-        # Title
-        title_layout = QHBoxLayout()
-        icon = QLabel("⏱️")
-        title = QLabel("Command History")
-        title.setFont(QFont("Arial", 12, QFont.Bold))
-        
-        title_layout.addWidget(icon)
-        title_layout.addWidget(title)
-        title_layout.addStretch()
-        
-        layout.addLayout(title_layout)
-        
-        # Command list
-        command_list = QVBoxLayout()
-        for cmd in self.commands:
-            item = CommandItem(cmd["type"], cmd["command"], cmd["timestamp"], cmd["status"])
-            command_list.addWidget(item)
-            
-        layout.addLayout(command_list)
-        self.setLayout(layout)
-
 
 class VoiceCommandView(BaseView):
-    """Voice command view for the application"""
+    """View for the voice command functionality"""
     
     def __init__(self, parent=None):
-        self.is_listening = False
-        self.recognized_text = ""
-        self.commands = [
-            {"id": "1", "type": "voice", "command": "Open Browser", "timestamp": "10:15 AM", "status": "success"},
-            {"id": "2", "type": "voice", "command": "Volume Up", "timestamp": "10:12 AM", "status": "success"},
-            {"id": "3", "type": "voice", "command": "Launch Spotify", "timestamp": "10:10 AM", "status": "error"},
-            {"id": "4", "type": "voice", "command": "Next Slide", "timestamp": "10:05 AM", "status": "success"},
-        ]
         super().__init__(parent)
+        self.is_listening = False
+        self.visualizer_timer = QTimer()
+        self.visualizer_timer.timeout.connect(self.update_visualizer)
+        self.visualizer_levels = []
         
     def setup_ui(self):
+        """Set up the UI components"""
         super().setup_ui()
         
-        # Title
+        # Main title
         title_label = QLabel("Voice Command Control")
-        title_label.setFont(QFont("Arial", 18, QFont.Bold))
+        title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
         self.main_layout.addWidget(title_label)
         
-        subtitle = QLabel("Control your system using voice commands")
-        subtitle.setStyleSheet("color: #B0B0B0;")
-        self.main_layout.addWidget(subtitle)
+        subtitle_label = QLabel("Control your system using voice commands")
+        subtitle_label.setStyleSheet("font-size: 14px; color: #888;")
+        self.main_layout.addWidget(subtitle_label)
         
-        # Main content layout (grid with voice control and history)
-        content_layout = QGridLayout()
+        # Main content layout
+        content_layout = QHBoxLayout()
         
-        # Voice control card
-        voice_control = QFrame()
-        voice_control.setStyleSheet("""
-            QFrame {
-                background-color: #2A2F3C;
-                border-radius: 10px;
-                border: 1px solid #3A3F4C;
-            }
-        """)
+        # Left column - Voice visualization and controls
+        left_layout = QVBoxLayout()
         
-        vc_layout = QVBoxLayout(voice_control)
+        # Microphone button and visualizer
+        mic_container = QWidget()
+        mic_container.setStyleSheet("background-color: #2A2F3C; border-radius: 10px; padding: 20px;")
+        mic_layout = QVBoxLayout(mic_container)
         
-        # Header with title and status
-        header_layout = QHBoxLayout()
-        vc_title = QLabel("Voice Recognition")
-        vc_title.setFont(QFont("Arial", 14, QFont.Bold))
+        # Status indicator
+        status_layout = QHBoxLayout()
+        status_label = QLabel("Status:")
+        self.status_indicator = QLabel("Idle")
+        self.status_indicator.setStyleSheet("color: #888; font-weight: bold;")
+        status_layout.addWidget(status_label)
+        status_layout.addWidget(self.status_indicator)
+        status_layout.addStretch()
+        mic_layout.addLayout(status_layout)
         
-        self.status_label = QLabel("Idle")
-        self.status_label.setStyleSheet("""
-            background-color: transparent;
-            color: #B0B0B0;
-            border: 1px solid #B0B0B0;
-            border-radius: 10px;
-            padding: 2px 8px;
-        """)
+        # Visualizer
+        self.visualizer_widget = QWidget()
+        self.visualizer_widget.setMinimumHeight(80)
+        self.visualizer_widget.setStyleSheet("background-color: #1E212A; border-radius: 5px;")
+        mic_layout.addWidget(self.visualizer_widget)
         
-        header_layout.addWidget(vc_title)
-        header_layout.addStretch()
-        header_layout.addWidget(self.status_label)
+        # Recognized text display
+        text_layout = QVBoxLayout()
+        text_label = QLabel("Recognized Text:")
+        self.text_display = QLabel("Click the microphone to start")
+        self.text_display.setStyleSheet("background-color: #1E212A; border-radius: 5px; padding: 10px; min-height: 40px;")
+        text_layout.addWidget(text_label)
+        text_layout.addWidget(self.text_display)
+        mic_layout.addLayout(text_layout)
         
-        vc_layout.addLayout(header_layout)
+        # Microphone button
+        button_layout = QHBoxLayout()
+        self.toggle_button = QPushButton("Start Listening")
+        self.toggle_button.setMinimumHeight(40)
+        self.toggle_button.clicked.connect(self.toggle_listening)
+        button_layout.addStretch()
+        button_layout.addWidget(self.toggle_button)
+        button_layout.addStretch()
+        mic_layout.addLayout(button_layout)
         
-        # Voice button and visualizer
-        vc_center_layout = QVBoxLayout()
-        vc_center_layout.setAlignment(Qt.AlignCenter)
+        left_layout.addWidget(mic_container)
         
-        self.voice_button = QPushButton()
-        self.voice_button.setFixedSize(80, 80)
-        self.voice_button.setStyleSheet("""
-            QPushButton {
-                background-color: #6D28D9;
-                border-radius: 40px;
-                color: white;
-                font-size: 24px;
-            }
-            QPushButton:hover {
-                background-color: #5B21B6;
-            }
-        """)
-        self.voice_button.setText("🎤")
-        self.voice_button.clicked.connect(self.toggle_listening)
-        
-        vc_center_layout.addWidget(self.voice_button, alignment=Qt.AlignCenter)
-        
-        # Voice visualizer
-        self.visualizer = VoiceVisualizer()
-        vc_center_layout.addWidget(self.visualizer)
-        
-        # Recognized text area
-        self.text_area = QFrame()
-        self.text_area.setStyleSheet("""
-            QFrame {
-                background-color: rgba(139, 92, 246, 0.1);
-                border-radius: 5px;
-                min-height: 60px;
-            }
-        """)
-        
-        text_layout = QVBoxLayout(self.text_area)
-        self.recognized_label = QLabel("Click the microphone to start")
-        self.recognized_label.setAlignment(Qt.AlignCenter)
-        self.recognized_label.setStyleSheet("color: #B0B0B0;")
-        text_layout.addWidget(self.recognized_label)
-        
-        vc_center_layout.addWidget(self.text_area)
-        vc_layout.addLayout(vc_center_layout)
-        
-        # Tips section
-        tips_frame = QFrame()
-        tips_frame.setStyleSheet("""
-            QFrame {
-                background-color: rgba(139, 92, 246, 0.1);
-                border-radius: 5px;
-            }
-        """)
-        
-        tips_layout = QHBoxLayout(tips_frame)
-        
-        tips_icon = QLabel("ℹ️")
-        
-        tips_content = QVBoxLayout()
+        # Tips box
+        tips_box = QWidget()
+        tips_layout = QVBoxLayout(tips_box)
         tips_title = QLabel("Voice Command Tips")
-        tips_title.setFont(QFont("Arial", 10, QFont.Bold))
-        
+        tips_title.setStyleSheet("font-weight: bold;")
         tips_text = QLabel("Try commands like \"Open Browser\", \"Volume Up\", \"Close Window\", or \"Scroll Down\" to control your system.")
         tips_text.setWordWrap(True)
-        tips_text.setStyleSheet("color: #B0B0B0;")
+        tips_layout.addWidget(tips_title)
+        tips_layout.addWidget(tips_text)
+        tips_box.setStyleSheet("background-color: rgba(139, 92, 246, 0.2); border-radius: 5px; padding: 10px;")
+        left_layout.addWidget(tips_box)
         
-        tips_content.addWidget(tips_title)
-        tips_content.addWidget(tips_text)
+        # Right column - Command history
+        right_layout = QVBoxLayout()
+        history_title = QLabel("Command History")
+        history_title.setStyleSheet("font-size: 18px; font-weight: bold;")
+        right_layout.addWidget(history_title)
         
-        tips_layout.addWidget(tips_icon)
-        tips_layout.addLayout(tips_content)
+        self.command_list = QListWidget()
+        self.command_list.setAlternatingRowColors(True)
+        self.command_list.setStyleSheet("alternate-background-color: #2A2F3C;")
+        right_layout.addWidget(self.command_list)
         
-        vc_layout.addWidget(tips_frame)
+        # Add demo commands
+        self.add_demo_commands()
         
-        # Add voice control to content layout
-        content_layout.addWidget(voice_control, 0, 0, 1, 2)
-        
-        # Command history
-        history_widget = CommandHistory(self.commands)
-        content_layout.addWidget(history_widget, 0, 2)
-        
-        content_layout.setColumnStretch(0, 2)
-        content_layout.setColumnStretch(2, 1)
+        # Add layouts to main content
+        content_layout.addLayout(left_layout, 2)
+        content_layout.addLayout(right_layout, 1)
         
         self.main_layout.addLayout(content_layout)
         
+        # Add navigation bar at the bottom
+        self.main_layout.addLayout(self.nav_layout)
+        
+    def add_demo_commands(self):
+        """Add demo commands to the command history"""
+        commands = [
+            {"command": "Open Browser", "timestamp": "10:15 AM", "status": "success"},
+            {"command": "Volume Up", "timestamp": "10:12 AM", "status": "success"},
+            {"command": "Launch Spotify", "timestamp": "10:10 AM", "status": "error"},
+            {"command": "Next Slide", "timestamp": "10:05 AM", "status": "success"},
+        ]
+        
+        for cmd in commands:
+            item = QListWidgetItem(f"{cmd['timestamp']} - {cmd['command']}")
+            if cmd["status"] == "success":
+                item.setForeground(QColor(0, 200, 0))
+            else:
+                item.setForeground(QColor(255, 0, 0))
+            self.command_list.addItem(item)
+
     def toggle_listening(self):
-        """Toggle the voice listening state"""
+        """Toggle voice recognition on/off"""
         self.is_listening = not self.is_listening
         
         if self.is_listening:
-            self.voice_button.setStyleSheet("""
-                QPushButton {
-                    background-color: #EF4444;
-                    border-radius: 40px;
-                    color: white;
-                    font-size: 24px;
-                }
-                QPushButton:hover {
-                    background-color: #DC2626;
-                }
-            """)
-            self.status_label.setText("Listening")
-            self.status_label.setStyleSheet("""
-                background-color: #8B5CF6;
-                color: white;
-                border: none;
-                border-radius: 10px;
-                padding: 2px 8px;
-            """)
-            self.recognized_label.setText("Listening...")
-            
-            # Here would be the code to activate speech recognition
-            # For now, we'll just simulate with the visualizer
-            self.visualizer.set_active(True)
+            # Start listening
+            self.toggle_button.setText("Stop Listening")
+            self.status_indicator.setText("Listening")
+            self.status_indicator.setStyleSheet("color: #8B5CF6; font-weight: bold;")
+            self.text_display.setText("Listening...")
+            self.visualizer_timer.start(50)
+            # Here you would initialize the speech recognition
         else:
-            self.voice_button.setStyleSheet("""
-                QPushButton {
-                    background-color: #6D28D9;
-                    border-radius: 40px;
-                    color: white;
-                    font-size: 24px;
-                }
-                QPushButton:hover {
-                    background-color: #5B21B6;
-                }
-            """)
-            self.status_label.setText("Idle")
-            self.status_label.setStyleSheet("""
-                background-color: transparent;
-                color: #B0B0B0;
-                border: 1px solid #B0B0B0;
-                border-radius: 10px;
-                padding: 2px 8px;
-            """)
-            self.recognized_label.setText("Click the microphone to start")
-            self.visualizer.set_active(False)
+            # Stop listening
+            self.toggle_button.setText("Start Listening")
+            self.status_indicator.setText("Idle")
+            self.status_indicator.setStyleSheet("color: #888; font-weight: bold;")
+            self.text_display.setText("Click the microphone to start")
+            self.visualizer_timer.stop()
+            self.visualizer_levels = []
+            self.update_visualizer()
+            # Here you would stop the speech recognition
+    
+    def update_visualizer(self):
+        """Update the audio visualizer display"""
+        if self.is_listening:
+            # Generate random visualizer levels for demo
+            # In a real app, this would use actual microphone input levels
+            num_bars = 20
+            self.visualizer_levels = np.random.randint(10, 70, num_bars).tolist()
+        else:
+            self.visualizer_levels = [5] * 20  # Flat line when not listening
+            
+        # Force a repaint to draw the visualizer
+        self.visualizer_widget.update()
+        
+    def paintEvent(self, event):
+        """Handle painting the visualizer"""
+        super().paintEvent(event)
+        
+        if hasattr(self, 'visualizer_widget'):
+            from PyQt5.QtGui import QPainter, QColor
+            
+            painter = QPainter(self.visualizer_widget)
+            painter.setRenderHint(QPainter.Antialiasing)
+            
+            width = self.visualizer_widget.width()
+            height = self.visualizer_widget.height()
+            
+            # If no levels yet, initialize flat
+            if not self.visualizer_levels:
+                self.visualizer_levels = [5] * 20
+            
+            # Calculate bar width and spacing
+            num_bars = len(self.visualizer_levels)
+            bar_width = (width - (num_bars - 1) * 2) / num_bars
+            
+            # Draw the visualization bars
+            for i, level in enumerate(self.visualizer_levels):
+                # Map level to height
+                bar_height = (level / 100) * height
+                
+                # Set color based on level
+                if self.is_listening:
+                    color = QColor(139, 92, 246)  # Purple for active
+                else:
+                    color = QColor(100, 100, 100)  # Gray for inactive
+                
+                painter.setPen(Qt.NoPen)
+                painter.setBrush(color)
+                
+                x = i * (bar_width + 2)
+                y = height - bar_height
+                
+                painter.drawRoundedRect(x, y, bar_width, bar_height, 2, 2)
+            
+            painter.end()

@@ -27,6 +27,13 @@ class Gaminator(QMainWindow):
         self.dashboard_view = DashboardView(self)
         self.settings_view = SettingsView(self)
         
+        # Connect navigation signals
+        self.home_view.navigate_signal.connect(self.navigate_to)
+        self.voice_command_view.navigate_signal.connect(self.navigate_to)
+        self.gesture_control_view.navigate_signal.connect(self.navigate_to)
+        self.dashboard_view.navigate_signal.connect(self.navigate_to)
+        self.settings_view.navigate_signal.connect(self.navigate_to)
+        
         # Add views to stacked widget
         self.stacked_widget.addWidget(self.home_view)
         self.stacked_widget.addWidget(self.voice_command_view)
@@ -55,6 +62,35 @@ class Gaminator(QMainWindow):
             }
             QLabel {
                 color: #FFFFFF;
+            }
+            QCheckBox {
+                color: #FFFFFF;
+            }
+            QComboBox {
+                background-color: #2A2F3C;
+                color: #FFFFFF;
+                border: 1px solid #444;
+                border-radius: 3px;
+                padding: 5px;
+            }
+            QComboBox QAbstractItemView {
+                background-color: #2A2F3C;
+                color: #FFFFFF;
+                selection-background-color: #8B5CF6;
+            }
+            QSlider::groove:horizontal {
+                border: 1px solid #444;
+                height: 8px;
+                background: #2A2F3C;
+                margin: 2px 0;
+                border-radius: 4px;
+            }
+            QSlider::handle:horizontal {
+                background: #8B5CF6;
+                border: 1px solid #8B5CF6;
+                width: 18px;
+                margin: -2px 0;
+                border-radius: 9px;
             }
         """)
 

@@ -1,317 +1,219 @@
 
-from PyQt5.QtWidgets import (QLabel, QPushButton, QVBoxLayout, QHBoxLayout, 
-                           QGridLayout, QFrame, QSlider, QComboBox, QCheckBox)
+from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QHBoxLayout, QWidget, 
+                             QCheckBox, QSlider, QComboBox)
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
 from views.base_view import BaseView
 
-class SettingGroup(QFrame):
-    """Group of related settings"""
-    
-    def __init__(self, title, description, icon, parent=None):
-        super().__init__(parent)
-        self.title = title
-        self.description = description
-        self.icon = icon
-        self.setup_ui()
-        
-    def setup_ui(self):
-        self.setStyleSheet("""
-            QFrame {
-                background-color: #2A2F3C;
-                border-radius: 10px;
-                border: 1px solid #3A3F4C;
-            }
-            QLabel {
-                color: white;
-            }
-            QSlider::groove:horizontal {
-                border: 1px solid #999999;
-                height: 8px;
-                background: #1A1F2C;
-                border-radius: 4px;
-            }
-            QSlider::handle:horizontal {
-                background: #8B5CF6;
-                border: 1px solid #5B21B6;
-                width: 18px;
-                border-radius: 9px;
-                margin: -5px 0;
-            }
-            QSlider::sub-page:horizontal {
-                background: #8B5CF6;
-                border-radius: 4px;
-            }
-            QComboBox {
-                background-color: #1A1F2C;
-                border: 1px solid #3A3F4C;
-                border-radius: 4px;
-                color: white;
-                padding: 4px;
-            }
-            QComboBox::drop-down {
-                border: none;
-            }
-            QComboBox::down-arrow {
-                image: url();
-                width: 0px;
-                height: 0px;
-            }
-            QComboBox QAbstractItemView {
-                background-color: #1A1F2C;
-                border: 1px solid #3A3F4C;
-                selection-background-color: #8B5CF6;
-                color: white;
-            }
-            QCheckBox {
-                color: white;
-            }
-            QCheckBox::indicator {
-                width: 18px;
-                height: 18px;
-                border-radius: 4px;
-            }
-            QCheckBox::indicator:unchecked {
-                border: 2px solid #6B7280;
-                background: #1A1F2C;
-            }
-            QCheckBox::indicator:checked {
-                background: #8B5CF6;
-                border: 2px solid #8B5CF6;
-            }
-        """)
-        
-        layout = QVBoxLayout()
-        
-        # Header
-        header_layout = QHBoxLayout()
-        icon_label = QLabel(self.icon)
-        
-        title_layout = QVBoxLayout()
-        title_label = QLabel(self.title)
-        title_label.setFont(QFont("Arial", 12, QFont.Bold))
-        
-        desc_label = QLabel(self.description)
-        desc_label.setStyleSheet("color: #B0B0B0; font-size: 8pt;")
-        
-        title_layout.addWidget(title_label)
-        title_layout.addWidget(desc_label)
-        
-        header_layout.addWidget(icon_label)
-        header_layout.addLayout(title_layout)
-        header_layout.addStretch()
-        
-        layout.addLayout(header_layout)
-        
-        # Content area for child widgets
-        self.content_layout = QVBoxLayout()
-        self.content_layout.setContentsMargins(10, 10, 10, 10)
-        
-        layout.addLayout(self.content_layout)
-        self.setLayout(layout)
-        
-    def add_toggle_setting(self, label, description, default_checked=False):
-        """Add a toggle switch setting"""
-        setting_layout = QVBoxLayout()
-        
-        # Label and description
-        label_layout = QHBoxLayout()
-        setting_label = QLabel(label)
-        setting_label.setFont(QFont("Arial", 10))
-        
-        toggle = QCheckBox()
-        toggle.setChecked(default_checked)
-        
-        label_layout.addWidget(setting_label)
-        label_layout.addStretch()
-        label_layout.addWidget(toggle)
-        
-        # Description
-        desc_label = QLabel(description)
-        desc_label.setStyleSheet("color: #B0B0B0; font-size: 8pt;")
-        
-        setting_layout.addLayout(label_layout)
-        setting_layout.addWidget(desc_label)
-        
-        self.content_layout.addLayout(setting_layout)
-        self.content_layout.addSpacing(10)
-        
-        return toggle
-        
-    def add_slider_setting(self, label, min_val=0, max_val=100, default_value=50):
-        """Add a slider setting"""
-        setting_layout = QVBoxLayout()
-        
-        # Label
-        label_layout = QHBoxLayout()
-        setting_label = QLabel(label)
-        
-        value_label = QLabel(f"{default_value}")
-        
-        label_layout.addWidget(setting_label)
-        label_layout.addStretch()
-        label_layout.addWidget(value_label)
-        
-        # Slider
-        slider = QSlider(Qt.Horizontal)
-        slider.setMinimum(min_val)
-        slider.setMaximum(max_val)
-        slider.setValue(default_value)
-        
-        # Connect slider value change to update the value label
-        slider.valueChanged.connect(lambda val: value_label.setText(f"{val}"))
-        
-        setting_layout.addLayout(label_layout)
-        setting_layout.addWidget(slider)
-        
-        self.content_layout.addLayout(setting_layout)
-        self.content_layout.addSpacing(10)
-        
-        return slider
-        
-    def add_select_setting(self, label, options, default_value=None):
-        """Add a select/dropdown setting"""
-        setting_layout = QVBoxLayout()
-        
-        # Label
-        setting_label = QLabel(label)
-        
-        # Combo box
-        combo = QComboBox()
-        for option in options:
-            combo.addItem(option['label'], option['value'])
-            
-        # Set default if provided
-        if default_value:
-            index = combo.findData(default_value)
-            if index >= 0:
-                combo.setCurrentIndex(index)
-        
-        setting_layout.addWidget(setting_label)
-        setting_layout.addWidget(combo)
-        
-        self.content_layout.addLayout(setting_layout)
-        self.content_layout.addSpacing(10)
-        
-        return combo
-
-
 class SettingsView(BaseView):
-    """Settings view for the application"""
+    """View for application settings"""
     
     def __init__(self, parent=None):
         super().__init__(parent)
         
     def setup_ui(self):
+        """Set up the UI components"""
         super().setup_ui()
         
-        # Title
+        # Main title
         title_label = QLabel("Settings")
-        title_label.setFont(QFont("Arial", 18, QFont.Bold))
+        title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
         self.main_layout.addWidget(title_label)
         
-        subtitle = QLabel("Customize your GAMINATOR experience")
-        subtitle.setStyleSheet("color: #B0B0B0;")
-        self.main_layout.addWidget(subtitle)
+        subtitle_label = QLabel("Customize your GAMINATOR experience")
+        subtitle_label.setStyleSheet("font-size: 14px; color: #888;")
+        self.main_layout.addWidget(subtitle_label)
         
-        # Settings grid layout
-        settings_layout = QGridLayout()
+        # Settings layout with two columns
+        settings_layout = QHBoxLayout()
         
-        # Voice Command Settings
-        voice_settings = SettingGroup("Voice Command Settings", 
-                                      "Configure voice recognition options", 
-                                      "🎤")
+        # Left column
+        left_layout = QVBoxLayout()
         
-        voice_settings.add_toggle_setting("Enable Voice Commands", 
-                                         "Turn voice command recognition on or off", 
-                                         True)
+        # Voice command settings
+        voice_settings = self.create_settings_section("Voice Command Settings", "Configure voice recognition options")
         
-        voice_settings.add_slider_setting("Microphone Sensitivity", 0, 100, 75)
+        # Add settings to the voice section
+        voice_enable = QCheckBox("Enable Voice Commands")
+        voice_enable.setChecked(True)
+        voice_enable_desc = QLabel("Turn voice command recognition on or off")
+        voice_enable_desc.setStyleSheet("color: #888; font-size: 12px;")
         
-        lang_options = [
-            {"value": "en-US", "label": "English (US)"},
-            {"value": "en-UK", "label": "English (UK)"},
-            {"value": "es", "label": "Spanish"},
-            {"value": "fr", "label": "French"},
-            {"value": "de", "label": "German"}
-        ]
-        voice_settings.add_select_setting("Language", lang_options, "en-US")
+        voice_sensitivity_label = QLabel("Microphone Sensitivity")
+        voice_sensitivity = QSlider(Qt.Horizontal)
+        voice_sensitivity.setValue(75)
         
-        voice_settings.add_toggle_setting("Continuous Listening", 
-                                         "Keep listening for commands without manually activating", 
-                                         False)
+        voice_language_label = QLabel("Language")
+        voice_language = QComboBox()
+        voice_language.addItems(["English (US)", "English (UK)", "Spanish", "French", "German"])
         
-        # Gesture Control Settings
-        gesture_settings = SettingGroup("Gesture Control Settings", 
-                                        "Configure hand gesture recognition options", 
-                                        "👋")
+        continuous_listening = QCheckBox("Continuous Listening")
+        continuous_listening.setChecked(False)
+        continuous_listening_desc = QLabel("Keep listening for commands without manually activating")
+        continuous_listening_desc.setStyleSheet("color: #888; font-size: 12px;")
         
-        gesture_settings.add_toggle_setting("Enable Gesture Control", 
-                                           "Turn hand gesture recognition on or off", 
-                                           True)
+        voice_layout = QVBoxLayout()
+        voice_layout.addWidget(voice_enable)
+        voice_layout.addWidget(voice_enable_desc)
+        voice_layout.addSpacing(10)
+        voice_layout.addWidget(voice_sensitivity_label)
+        voice_layout.addWidget(voice_sensitivity)
+        voice_layout.addSpacing(10)
+        voice_layout.addWidget(voice_language_label)
+        voice_layout.addWidget(voice_language)
+        voice_layout.addSpacing(10)
+        voice_layout.addWidget(continuous_listening)
+        voice_layout.addWidget(continuous_listening_desc)
         
-        camera_options = [
-            {"value": "default", "label": "Default Camera"},
-            {"value": "usb", "label": "USB Camera"},
-            {"value": "external", "label": "External Webcam"}
-        ]
-        gesture_settings.add_select_setting("Camera Source", camera_options, "default")
+        voice_settings.layout().addLayout(voice_layout)
         
-        gesture_settings.add_slider_setting("Detection Sensitivity", 0, 100, 65)
+        # System settings
+        system_settings = self.create_settings_section("System Settings", "Configure general system behavior")
         
-        gesture_settings.add_toggle_setting("Show Hand Skeleton", 
-                                          "Display skeletal tracking on detected hands", 
-                                          True)
+        start_with_system = QCheckBox("Start with System")
+        start_with_system.setChecked(False)
+        start_desc = QLabel("Launch application when computer starts")
+        start_desc.setStyleSheet("color: #888; font-size: 12px;")
         
-        # System Settings
-        system_settings = SettingGroup("System Settings", 
-                                      "Configure general system behavior", 
-                                      "💻")
+        run_bg = QCheckBox("Run in Background")
+        run_bg.setChecked(True)
+        run_bg_desc = QLabel("Keep program running in the system tray")
+        run_bg_desc.setStyleSheet("color: #888; font-size: 12px;")
         
-        system_settings.add_toggle_setting("Start with System", 
-                                          "Launch application when computer starts", 
-                                          False)
+        theme_label = QLabel("Interface Theme")
+        theme = QComboBox()
+        theme.addItems(["System Default", "Dark Mode", "Light Mode"])
+        theme.setCurrentIndex(1)  # Dark mode selected
         
-        system_settings.add_toggle_setting("Run in Background", 
-                                         "Keep program running in the system tray", 
-                                         True)
+        animation_label = QLabel("UI Animation Speed")
+        animation = QSlider(Qt.Horizontal)
+        animation.setValue(80)
         
-        theme_options = [
-            {"value": "system", "label": "System Default"},
-            {"value": "dark", "label": "Dark Mode"},
-            {"value": "light", "label": "Light Mode"}
-        ]
-        system_settings.add_select_setting("Interface Theme", theme_options, "dark")
+        system_layout = QVBoxLayout()
+        system_layout.addWidget(start_with_system)
+        system_layout.addWidget(start_desc)
+        system_layout.addSpacing(10)
+        system_layout.addWidget(run_bg)
+        system_layout.addWidget(run_bg_desc)
+        system_layout.addSpacing(10)
+        system_layout.addWidget(theme_label)
+        system_layout.addWidget(theme)
+        system_layout.addSpacing(10)
+        system_layout.addWidget(animation_label)
+        system_layout.addWidget(animation)
         
-        system_settings.add_slider_setting("UI Animation Speed", 0, 100, 80)
+        system_settings.layout().addLayout(system_layout)
         
-        # Notification Settings
-        notification_settings = SettingGroup("Notification Settings", 
-                                            "Configure alerts and feedback", 
-                                            "🔔")
+        # Add sections to left column
+        left_layout.addWidget(voice_settings)
+        left_layout.addWidget(system_settings)
         
-        notification_settings.add_toggle_setting("Sound Feedback", 
-                                               "Play sounds on command recognition", 
-                                               True)
+        # Right column
+        right_layout = QVBoxLayout()
         
-        notification_settings.add_toggle_setting("Visual Notifications", 
-                                               "Show on-screen notifications for actions", 
-                                               True)
+        # Gesture settings
+        gesture_settings = self.create_settings_section("Gesture Control Settings", "Configure hand gesture recognition options")
         
-        notification_settings.add_slider_setting("Notification Duration", 1, 10, 3)
+        gesture_enable = QCheckBox("Enable Gesture Control")
+        gesture_enable.setChecked(True)
+        gesture_enable_desc = QLabel("Turn hand gesture recognition on or off")
+        gesture_enable_desc.setStyleSheet("color: #888; font-size: 12px;")
         
-        position_options = [
-            {"value": "top-right", "label": "Top Right"},
-            {"value": "top-left", "label": "Top Left"},
-            {"value": "bottom-right", "label": "Bottom Right"},
-            {"value": "bottom-left", "label": "Bottom Left"}
-        ]
-        notification_settings.add_select_setting("Notification Position", position_options, "top-right")
+        camera_label = QLabel("Camera Source")
+        camera = QComboBox()
+        camera.addItems(["Default Camera", "USB Camera", "External Webcam"])
         
-        # Add all setting groups to the grid
-        settings_layout.addWidget(voice_settings, 0, 0)
-        settings_layout.addWidget(gesture_settings, 0, 1)
-        settings_layout.addWidget(system_settings, 1, 0)
-        settings_layout.addWidget(notification_settings, 1, 1)
+        gesture_sensitivity_label = QLabel("Detection Sensitivity")
+        gesture_sensitivity = QSlider(Qt.Horizontal)
+        gesture_sensitivity.setValue(65)
+        
+        show_skeleton = QCheckBox("Show Hand Skeleton")
+        show_skeleton.setChecked(True)
+        skeleton_desc = QLabel("Display skeletal tracking on detected hands")
+        skeleton_desc.setStyleSheet("color: #888; font-size: 12px;")
+        
+        gesture_layout = QVBoxLayout()
+        gesture_layout.addWidget(gesture_enable)
+        gesture_layout.addWidget(gesture_enable_desc)
+        gesture_layout.addSpacing(10)
+        gesture_layout.addWidget(camera_label)
+        gesture_layout.addWidget(camera)
+        gesture_layout.addSpacing(10)
+        gesture_layout.addWidget(gesture_sensitivity_label)
+        gesture_layout.addWidget(gesture_sensitivity)
+        gesture_layout.addSpacing(10)
+        gesture_layout.addWidget(show_skeleton)
+        gesture_layout.addWidget(skeleton_desc)
+        
+        gesture_settings.layout().addLayout(gesture_layout)
+        
+        # Notification settings
+        notification_settings = self.create_settings_section("Notification Settings", "Configure alerts and feedback")
+        
+        sound_feedback = QCheckBox("Sound Feedback")
+        sound_feedback.setChecked(True)
+        sound_desc = QLabel("Play sounds on command recognition")
+        sound_desc.setStyleSheet("color: #888; font-size: 12px;")
+        
+        visual_notif = QCheckBox("Visual Notifications")
+        visual_notif.setChecked(True)
+        visual_desc = QLabel("Show on-screen notifications for actions")
+        visual_desc.setStyleSheet("color: #888; font-size: 12px;")
+        
+        duration_label = QLabel("Notification Duration")
+        duration = QSlider(Qt.Horizontal)
+        duration.setMinimum(1)
+        duration.setMaximum(10)
+        duration.setValue(3)
+        
+        position_label = QLabel("Notification Position")
+        position = QComboBox()
+        position.addItems(["Top Right", "Top Left", "Bottom Right", "Bottom Left"])
+        
+        notif_layout = QVBoxLayout()
+        notif_layout.addWidget(sound_feedback)
+        notif_layout.addWidget(sound_desc)
+        notif_layout.addSpacing(10)
+        notif_layout.addWidget(visual_notif)
+        notif_layout.addWidget(visual_desc)
+        notif_layout.addSpacing(10)
+        notif_layout.addWidget(duration_label)
+        notif_layout.addWidget(duration)
+        notif_layout.addSpacing(10)
+        notif_layout.addWidget(position_label)
+        notif_layout.addWidget(position)
+        
+        notification_settings.layout().addLayout(notif_layout)
+        
+        # Add sections to right column
+        right_layout.addWidget(gesture_settings)
+        right_layout.addWidget(notification_settings)
+        
+        # Add columns to settings layout
+        settings_layout.addLayout(left_layout)
+        settings_layout.addLayout(right_layout)
         
         self.main_layout.addLayout(settings_layout)
+        
+        self.main_layout.addStretch()
+        
+        # Add navigation bar at the bottom
+        self.main_layout.addLayout(self.nav_layout)
+    
+    def create_settings_section(self, title, desc):
+        """Create a settings section with the given title and description"""
+        section = QWidget()
+        section.setStyleSheet("background-color: #2A2F3C; border-radius: 10px; padding: 15px;")
+        
+        section_layout = QVBoxLayout(section)
+        
+        title_label = QLabel(title)
+        title_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        section_layout.addWidget(title_label)
+        
+        desc_label = QLabel(desc)
+        desc_label.setStyleSheet("color: #888; font-size: 12px;")
+        section_layout.addWidget(desc_label)
+        
+        section_layout.addSpacing(10)
+        
+        return section
