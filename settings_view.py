@@ -1,7 +1,6 @@
-
 from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QHBoxLayout, QWidget, 
                              QCheckBox, QSlider, QComboBox, QPushButton)
-from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect, QSize, QPoint
+from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect, QSize, QPoint, QTimer
 from PyQt5.QtGui import QFont, QColor
 from base_view import BaseView
 
@@ -479,22 +478,26 @@ class SettingsView(BaseView):
         self.main_layout.addLayout(self.nav_layout)
         
         # Set up entry animations for cards
-        self.animate_cards_entry()
+        QTimer.singleShot(50, self.animate_cards_entry)
     
     def animate_cards_entry(self):
         """Create staggered entry animations for the settings cards"""
+        # Setup sequential animations with timers
         for i, card in enumerate(self.cards):
-            # Start with zero opacity
-            card.setGraphicsEffect(None)  # Clear any existing effects
+            # Create a timer to delay each card animation
+            QTimer.singleShot(i * 150, lambda idx=i: self.animate_single_card(idx))
+    
+    def animate_single_card(self, card_index):
+        """Animate a single card with the given index"""
+        if card_index < len(self.cards):
+            card = self.cards[card_index]
+            # Clear any existing effects
+            card.setGraphicsEffect(None)
             
-            # Create the animation with a staggered delay
+            # Create the animation
             anim = QPropertyAnimation(card, b"pos")
             anim.setDuration(600)
             anim.setStartValue(card.pos() + QPoint(0, 50))  # Start 50 pixels below
             anim.setEndValue(card.pos())
             anim.setEasingCurve(QEasingCurve.OutCubic)
-            
-            # Delay each card slightly
-            anim.setStartTime(i * 150)
             anim.start()
-
