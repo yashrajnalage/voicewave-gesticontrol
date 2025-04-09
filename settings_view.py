@@ -1,7 +1,7 @@
 
 from PyQt5.QtWidgets import (QLabel, QVBoxLayout, QHBoxLayout, QWidget, 
                              QCheckBox, QSlider, QComboBox, QPushButton)
-from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect, QSize
+from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect, QSize, QPoint
 from PyQt5.QtGui import QFont, QColor
 from base_view import BaseView
 
@@ -332,8 +332,10 @@ class SettingsView(BaseView):
     """View for application settings"""
     
     def __init__(self, parent=None):
-        super().__init__(parent)
+        # Initialize cards list before calling super().__init__
+        # This ensures it exists when setup_ui is called
         self.cards = []
+        super().__init__(parent)
         
     def setup_ui(self):
         """Set up the UI components"""
