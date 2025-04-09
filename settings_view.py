@@ -12,26 +12,26 @@ class SettingsCard(QWidget):
         self.setStyleSheet("""
             QWidget#settingsCard {
                 background-color: #262c3b;
-                border-radius: 8px;
-                padding: 15px;
-                margin-bottom: 10px;
+                border-radius: 12px;
+                padding: 20px;
+                margin-bottom: 15px;
             }
             QLabel#cardTitle {
-                font-size: 16px;
+                font-size: 18px;
                 font-weight: bold;
                 color: white;
             }
             QLabel#cardDesc {
                 color: #aaadb0;
-                font-size: 12px;
+                font-size: 14px;
             }
             QCheckBox {
                 color: white;
-                font-size: 14px;
+                font-size: 15px;
             }
             QCheckBox::indicator {
-                width: 18px;
-                height: 18px;
+                width: 20px;
+                height: 20px;
             }
             QCheckBox::indicator:unchecked {
                 border: 2px solid #555;
@@ -45,16 +45,16 @@ class SettingsCard(QWidget):
             }
             QLabel#optionDesc {
                 color: #888;
-                font-size: 12px;
-                padding-left: 24px;
+                font-size: 14px;
+                padding-left: 28px;
                 margin-top: -5px;
             }
         """)
         self.setObjectName("settingsCard")
         
         self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(15, 15, 15, 15)
-        self.layout.setSpacing(5)
+        self.layout.setContentsMargins(20, 20, 20, 20)
+        self.layout.setSpacing(8)
         
         self.title_label = QLabel(title)
         self.title_label.setObjectName("cardTitle")
@@ -68,7 +68,7 @@ class SettingsCard(QWidget):
             self.desc_label.setObjectName("cardDesc")
             self.layout.addWidget(self.desc_label)
         
-        self.layout.addSpacing(10)
+        self.layout.addSpacing(15)
         
     def add_checkbox_option(self, label, description=None, checked=False):
         """Add a checkbox option with optional description"""
@@ -80,9 +80,9 @@ class SettingsCard(QWidget):
             desc_label = QLabel(description)
             desc_label.setObjectName("optionDesc")
             self.layout.addWidget(desc_label)
-            self.layout.addSpacing(8)
+            self.layout.addSpacing(12)
         else:
-            self.layout.addSpacing(4)
+            self.layout.addSpacing(6)
             
         return checkbox
     
@@ -90,7 +90,9 @@ class SettingsCard(QWidget):
         """Add a slider option with label"""
         label_layout = QHBoxLayout()
         slider_label = QLabel(label)
+        slider_label.setStyleSheet("font-size: 15px;")
         value_label = QLabel(f"{default_value}%")
+        value_label.setStyleSheet("font-size: 15px;")
         value_label.setAlignment(Qt.AlignRight)
         label_layout.addWidget(slider_label)
         label_layout.addWidget(value_label)
@@ -101,25 +103,26 @@ class SettingsCard(QWidget):
         slider.setMinimum(min_value)
         slider.setMaximum(max_value)
         slider.setValue(default_value)
+        slider.setFixedHeight(30)  # Make slider taller for better handling
         slider.setStyleSheet("""
             QSlider::groove:horizontal {
                 border: 1px solid #444;
-                height: 8px;
+                height: 10px;
                 background: #2A2F3C;
                 margin: 2px 0;
-                border-radius: 4px;
+                border-radius: 5px;
             }
             QSlider::handle:horizontal {
                 background: #8B5CF6;
                 border: 1px solid #8B5CF6;
-                width: 18px;
-                margin: -2px 0;
-                border-radius: 9px;
+                width: 22px;
+                margin: -3px 0;
+                border-radius: 11px;
             }
         """)
         
         self.layout.addWidget(slider)
-        self.layout.addSpacing(10)
+        self.layout.addSpacing(15)
         
         # Update value label when slider changes
         slider.valueChanged.connect(lambda v: value_label.setText(f"{v}%"))
@@ -129,23 +132,26 @@ class SettingsCard(QWidget):
     def add_select_option(self, label, options):
         """Add a dropdown select option"""
         select_label = QLabel(label)
+        select_label.setStyleSheet("font-size: 15px;")
         self.layout.addWidget(select_label)
         
         select = QComboBox()
         select.addItems(options)
+        select.setFixedHeight(35)  # Make combobox taller for better usability
         select.setStyleSheet("""
             QComboBox {
                 background-color: #2A2F3C;
                 color: white;
                 border: 1px solid #444;
                 border-radius: 5px;
-                padding: 5px;
-                min-width: 6em;
+                padding: 8px;
+                min-width: 180px;
+                font-size: 14px;
             }
             QComboBox::drop-down {
                 subcontrol-origin: padding;
                 subcontrol-position: top right;
-                width: 15px;
+                width: 18px;
                 border-left-width: 1px;
                 border-left-color: #444;
                 border-left-style: solid;
@@ -153,7 +159,7 @@ class SettingsCard(QWidget):
         """)
         
         self.layout.addWidget(select)
-        self.layout.addSpacing(10)
+        self.layout.addSpacing(15)
         
         return select
 
@@ -170,16 +176,16 @@ class SettingsView(BaseView):
         
         # Main title
         title_label = QLabel("Settings")
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
+        title_label.setStyleSheet("font-size: 32px; font-weight: bold;")
         self.main_layout.addWidget(title_label)
         
         subtitle_label = QLabel("Customize your GAMINATOR experience")
-        subtitle_label.setStyleSheet("font-size: 14px; color: #aaadb0; margin-bottom: 20px;")
+        subtitle_label.setStyleSheet("font-size: 18px; color: #aaadb0; margin-bottom: 30px;")
         self.main_layout.addWidget(subtitle_label)
         
         # Settings layout with two columns
         settings_layout = QHBoxLayout()
-        settings_layout.setSpacing(20)
+        settings_layout.setSpacing(30)  # Increased spacing between columns
         
         # Left column
         left_layout = QVBoxLayout()
@@ -286,9 +292,9 @@ class SettingsView(BaseView):
         right_layout.addWidget(notification_settings)
         right_layout.addStretch()
         
-        # Add columns to settings layout
-        settings_layout.addLayout(left_layout)
-        settings_layout.addLayout(right_layout)
+        # Add columns to settings layout with proportional sizes
+        settings_layout.addLayout(left_layout, 1)
+        settings_layout.addLayout(right_layout, 1)
         
         # Add settings layout to main layout
         self.main_layout.addLayout(settings_layout)
