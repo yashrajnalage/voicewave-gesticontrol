@@ -296,22 +296,3 @@ class SettingsView(BaseView):
         
         # Add navigation bar at the bottom
         self.main_layout.addLayout(self.nav_layout)
-
-    def create_header(self, title, description=None):
-        """Create a section header with title and optional description"""
-        header = QWidget()
-        header_layout = QVBoxLayout(header)
-        
-        title_label = QLabel(title)
-        title_label.setStyleSheet("font-size: 16px; font-weight: bold;")
-        header_layout.addWidget(title_label)
-        
-        if description:
-            desc_label = QLabel(description)
-            desc_label.setStyleSheet("color: #888; font-size: 12px;")
-            header_layout.addWidget(desc_label)
-        
-        header_layout.addSpacing(10)
-        header_layout.setContentsMargins(0, 0, 0, 0)
-        
-        return header
